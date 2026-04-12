@@ -203,6 +203,9 @@ function handleGameTouchStart(event) {
 
 function handleGameTouchEnd(event) {
   event.preventDefault();
+  if (!gameState.hasStarted || gameState.isGameOver) {
+    return;
+  }
 
   const rect = elements.gameElement.getBoundingClientRect();
   const midX = rect.left + rect.width / 2;
