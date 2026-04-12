@@ -34,6 +34,25 @@ function setupGame() {
   window.addEventListener("keydown", handleKeyDown);
   window.addEventListener("keyup", handleKeyUp);
   elements.restartButton.addEventListener("click", () => restartGame(false));
+
+  elements.titleOverlay.addEventListener("touchstart", handleTitleTouch, {
+    passive: false,
+  });
+  elements.gameOverOverlay.addEventListener(
+    "touchstart",
+    handleGameOverTouch,
+    { passive: false },
+  );
+  elements.gameElement.addEventListener("touchstart", handleGameTouchStart, {
+    passive: false,
+  });
+  elements.gameElement.addEventListener("touchend", handleGameTouchEnd, {
+    passive: false,
+  });
+  elements.gameElement.addEventListener("touchcancel", handleGameTouchEnd, {
+    passive: false,
+  });
+
   showTitle();
   render();
 }
@@ -142,6 +161,65 @@ function handleKeyUp(event) {
     event.preventDefault();
     gameState.keys.right = false;
   }
+}
+
+function handleTitleTouch(event) {
+  event.preventDefault();
+  if (!gameState.hasStarted && !gameState.isGameOver) {
+    startGame();
+  }
+}
+
+function handleGameOverTouch(event) {
+  event.preventDefault();
+  if (gameState.isGameOver) {
+    restartGame(true);
+  }
+}
+
+function handleGameTouchStart(event) {
+  event.preventDefault();
+  if (!gameState.hasStarted || gameState.isGameOver) {
+    return;
+  }
+
+  const rect = elements.gameElement.getBoundingClientRect();
+  const midX = rect.left + rect.width / 2;
+
+  let hasLeft = false;
+  let hasRight = false;
+
+  for (const touch of event.touches) {
+    if (touch.clientX < midX) {
+      hasLeft = true;
+    } else {
+      hasRight = true;
+    }
+  }
+
+  gameState.keys.left = hasLeft;
+  gameState.keys.right = hasRight;
+}
+
+function handleGameTouchEnd(event) {
+  event.preventDefault();
+
+  const rect = elements.gameElement.getBoundingClientRect();
+  const midX = rect.left + rect.width / 2;
+
+  let hasLeft = false;
+  let hasRight = false;
+
+  for (const touch of event.touches) {
+    if (touch.clientX < midX) {
+      hasLeft = true;
+    } else {
+      hasRight = true;
+    }
+  }
+
+  gameState.keys.left = hasLeft;
+  gameState.keys.right = hasRight;
 }
 
 function render() {
