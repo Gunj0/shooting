@@ -1,0 +1,230 @@
+:root {
+  --page-bg: linear-gradient(180deg, #08111f 0%, #12253f 55%, #1a355a 100%);
+  --panel-bg: rgba(8, 17, 31, 0.82);
+  --panel-border: rgba(166, 214, 255, 0.28);
+  --text-main: #f1f7ff;
+  --text-muted: #b8cae0;
+  --player-color: #5df2c7;
+  --bullet-color: #ffe17a;
+  --enemy-color: #ff6b6b;
+  --overlay-bg: rgba(5, 8, 15, 0.75);
+  --button-bg: #ffe17a;
+  --button-text: #18243a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  font-family: "Trebuchet MS", "Hiragino Sans", sans-serif;
+  background: var(--page-bg);
+  color: var(--text-main);
+}
+
+.page {
+  width: min(100%, 420px);
+  padding: 24px 20px 32px;
+}
+
+.hud {
+  margin-bottom: 16px;
+  padding: 16px 18px;
+  border: 1px solid var(--panel-border);
+  border-radius: 18px;
+  background: var(--panel-bg);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.28);
+}
+
+.title,
+.scoreboard,
+.guide,
+.overlay-title,
+.overlay-score {
+  margin: 0;
+}
+
+.title {
+  font-size: 1.6rem;
+  letter-spacing: 0.08em;
+}
+
+.scoreboard {
+  margin-top: 8px;
+  color: var(--text-muted);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sep {
+  opacity: 0.6;
+}
+
+.game-shell {
+  position: relative;
+  padding: 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: 22px;
+  background: var(--panel-bg);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.28);
+}
+
+.game-area {
+  position: relative;
+  width: 300px;
+  height: 500px;
+  overflow: hidden;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at top, rgba(120, 180, 255, 0.18), transparent 32%),
+    linear-gradient(180deg, #112544 0%, #0a1730 65%, #060d1c 100%);
+}
+
+.game-area::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 30px 30px;
+  pointer-events: none;
+}
+
+.entity {
+  position: absolute;
+  border-radius: 6px;
+}
+
+.player {
+  background: var(--player-color);
+  box-shadow: 0 0 12px rgba(93, 242, 199, 0.7);
+}
+
+.bullet {
+  background: var(--bullet-color);
+  border-radius: 999px;
+  box-shadow: 0 0 10px rgba(255, 225, 122, 0.8);
+}
+
+.enemy {
+  background: var(--enemy-color);
+  box-shadow: 0 0 12px rgba(255, 107, 107, 0.5);
+}
+
+.powerup {
+  background: linear-gradient(135deg, #8af7ff 0%, #5df2c7 100%);
+  border-radius: 999px;
+  box-shadow: 0 0 12px rgba(138, 247, 255, 0.9);
+}
+
+.effect {
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.effect-enemy {
+  border: 2px solid rgba(255, 225, 122, 0.95);
+  box-shadow: 0 0 18px rgba(255, 225, 122, 0.7);
+}
+
+.effect-player {
+  border: 3px solid rgba(255, 107, 107, 0.95);
+  box-shadow: 0 0 22px rgba(255, 107, 107, 0.8);
+}
+
+.effect-powerup {
+  border: 2px solid rgba(138, 247, 255, 0.95);
+  box-shadow: 0 0 20px rgba(138, 247, 255, 0.9);
+}
+
+.game-area.hit-flash {
+  animation: hitFlash 240ms ease-out;
+}
+
+@keyframes hitFlash {
+  0% {
+    filter: brightness(1);
+  }
+  40% {
+    filter: brightness(2.1);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+.overlay {
+  position: absolute;
+  inset: 14px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: var(--overlay-bg);
+}
+
+.hidden {
+  display: none;
+}
+
+.overlay-card {
+  width: min(100%, 220px);
+  padding: 24px 20px;
+  text-align: center;
+  border-radius: 18px;
+  background: rgba(12, 20, 36, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.overlay-title {
+  font-size: 1.5rem;
+  letter-spacing: 0.08em;
+}
+
+.overlay-score {
+  margin-top: 12px;
+  color: var(--text-muted);
+}
+
+.restart-button {
+  margin-top: 18px;
+  width: 100%;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--button-text);
+  background: var(--button-bg);
+  cursor: pointer;
+}
+
+.guide {
+  margin-top: 14px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+@media (max-width: 380px) {
+  .page {
+    padding-inline: 12px;
+  }
+
+  .game-shell {
+    padding: 10px;
+  }
+
+  .overlay {
+    inset: 10px;
+  }
+}
