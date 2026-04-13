@@ -7,25 +7,27 @@
 
 ## ビルド・テスト・lint
 
-- このリポジトリには、ビルド・lint・自動テスト用のコマンド定義が存在しない。
-- テストランナーやテストファイルも存在しないため、単体テスト 1 件だけを実行するコマンドも存在しない。
+- パッケージ管理は `pnpm` を使用し、`npm` は使用しない。
+- 脆弱性対応の観点から、テスト基盤は依存関係が最小の構成を優先する。
+- テストは原則として Node.js 標準の `node:test` / `node:assert` を用い、外部テストライブラリの追加は明確な理由がある場合に限る。
+- 自動テスト実行コマンドは `pnpm test` とする。
 
 ## アーキテクチャ概要
 
-- これは `index.html`・`style.css`・ES Modules の JavaScript で構成された静的なブラウザゲーム。`index.html` から `<script type="module" src="script.js">` で直接読み込んでおり、バンドラやフレームワークは使っていない。
-- `script.js` は全体の司令塔で、DOM 要素の取得、キーボード入力、開始・再開フロー、`requestAnimationFrame` のループ、被弾フラッシュ、高スコア更新を担当する。
+- これは `index.html`・`style/style.css`・ES Modules の JavaScript で構成された静的なブラウザゲーム。`index.html` から `<script type="module" src="js/script.js">` で直接読み込んでおり、バンドラやフレームワークは使っていない。
+- `js/script.js` は全体の司令塔で、DOM 要素の取得、キーボード入力、開始・再開フロー、`requestAnimationFrame` のループ、被弾フラッシュ、高スコア更新を担当する。
 - `js/state.js` はミュータブルな `gameState` の初期化を担当する。`js/constants.js` にゲーム領域サイズ、各エンティティサイズ、速度、保存キー、演出時間、パワーアップ値、`DIFFICULTY_SETTINGS` が集約されている。
 - `js/systems.js` はゲーム進行ロジックをまとめた層で、難易度更新、プレイヤー移動、自動発射、敵とパワーアップの生成、位置更新、当たり判定、スコア加算、演出寿命の更新を担当する。
-- `js/render.js` は毎フレーム `#game` の中身を空にして、絶対配置した `div` 要素を再構築する。見た目は `player` / `bullet` / `enemy` / `powerup` / `effect-*` などのクラス名で `style.css` と結び付いている。
+- `js/render.js` は毎フレーム `#game` の中身を空にして、絶対配置した `div` 要素を再構築する。見た目は `player` / `bullet` / `enemy` / `powerup` / `effect-*` などのクラス名で `style/style.css` と結び付いている。
 - `js/storage.js` は高スコアの `localStorage` 読み書きだけを担当する。
 
 ## 主要な規約
 
 - 設計書どおり、外部ライブラリなしの Vanilla JS を維持すること。描画は canvas ではなく `div` ベース、画像アセットも使わない前提。
-- `script.js` のフレーム更新順は崩さないこと。難易度更新 -> 入力反映 -> 発射 -> 生成 -> 移動 -> 当たり判定 -> 演出更新 -> 描画、という順序に意味がある。
+- `js/script.js` のフレーム更新順は崩さないこと。難易度更新 -> 入力反映 -> 発射 -> 生成 -> 移動 -> 当たり判定 -> 演出更新 -> 描画、という順序に意味がある。
 - ゲームバランスやサイズ・速度・時間調整は `js/constants.js` を単一の調整ポイントとして扱い、マジックナンバーを他ファイルへ散らさないこと。
 - `js/systems.js` は共有 state を直接更新するスタイルで統一されている。配列更新は `map(...).filter(...)` で置き換える実装に合わせること。
 - 画面状態は `hasStarted` と `isGameOver`、および overlay の `hidden` クラスで管理する。別画面遷移やルーティングを導入しない前提で拡張すること。
 - 再開導線は 2 種類ある。`RESTART` ボタンはタイトル画面に戻し、スペースキーは即時リトライする。
-- 高スコアは `createInitialState(loadHighScore())` で初期化し、`script.js` の `updateHighScore()` から保存する。`js/storage.js` にゲーム進行ロジックを持ち込まないこと。
+- 高スコアは `createInitialState(loadHighScore())` で初期化し、`js/script.js` の `updateHighScore()` から保存する。`js/storage.js` にゲーム進行ロジックを持ち込まないこと。
 - スペースキーと左右キーでは `preventDefault()` を呼び、ブラウザのスクロール動作を抑止する前提を維持すること。

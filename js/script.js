@@ -1,7 +1,7 @@
-import { PLAYER_HIT_FLASH_MS } from "./js/constants.js";
-import { renderFrame } from "./js/render.js";
-import { createInitialState } from "./js/state.js";
-import { loadHighScore, saveHighScore } from "./js/storage.js";
+import { PLAYER_HIT_FLASH_MS } from "./constants.js";
+import { renderFrame } from "./render.js";
+import { createInitialState } from "./state.js";
+import { loadHighScore, saveHighScore } from "./storage.js";
 import {
   handleCollisions,
   shootBullet,
@@ -13,7 +13,7 @@ import {
   updateEnemies,
   updatePlayerPosition,
   updatePowerUps,
-} from "./js/systems.js";
+} from "./systems.js";
 
 const elements = {
   gameElement: document.getElementById("game"),
@@ -34,25 +34,6 @@ function setupGame() {
   window.addEventListener("keydown", handleKeyDown);
   window.addEventListener("keyup", handleKeyUp);
   elements.restartButton.addEventListener("click", () => restartGame(false));
-
-  elements.titleOverlay.addEventListener("touchstart", handleTitleTouch, {
-    passive: false,
-  });
-  elements.gameOverOverlay.addEventListener(
-    "touchstart",
-    handleGameOverTouch,
-    { passive: false },
-  );
-  elements.gameElement.addEventListener("touchstart", handleGameTouchStart, {
-    passive: false,
-  });
-  elements.gameElement.addEventListener("touchend", handleGameTouchEnd, {
-    passive: false,
-  });
-  elements.gameElement.addEventListener("touchcancel", handleGameTouchEnd, {
-    passive: false,
-  });
-
   showTitle();
   render();
 }
@@ -130,7 +111,7 @@ function loop(now) {
 }
 
 function handleKeyDown(event) {
-  if (event.code === "Space") {
+  if (isSpaceKey(event)) {
     event.preventDefault();
     if (gameState.isGameOver) {
       restartGame(true);
@@ -163,66 +144,13 @@ function handleKeyUp(event) {
   }
 }
 
-function handleTitleTouch(event) {
-  event.preventDefault();
-  if (!gameState.hasStarted && !gameState.isGameOver) {
-    startGame();
-  }
-}
-
-function handleGameOverTouch(event) {
-  event.preventDefault();
-  if (gameState.isGameOver) {
-    restartGame(true);
-  }
-}
-
-function handleGameTouchStart(event) {
-  event.preventDefault();
-  if (!gameState.hasStarted || gameState.isGameOver) {
-    return;
-  }
-
-  const rect = elements.gameElement.getBoundingClientRect();
-  const midX = rect.left + rect.width / 2;
-
-  let hasLeft = false;
-  let hasRight = false;
-
-  for (const touch of event.touches) {
-    if (touch.clientX < midX) {
-      hasLeft = true;
-    } else {
-      hasRight = true;
-    }
-  }
-
-  gameState.keys.left = hasLeft;
-  gameState.keys.right = hasRight;
-}
-
-function handleGameTouchEnd(event) {
-  event.preventDefault();
-  if (!gameState.hasStarted || gameState.isGameOver) {
-    return;
-  }
-
-  const rect = elements.gameElement.getBoundingClientRect();
-  const midX = rect.left + rect.width / 2;
-
-  let hasLeft = false;
-  let hasRight = false;
-
-  for (const touch of event.touches) {
-    if (touch.clientX < midX) {
-      hasLeft = true;
-    } else {
-      hasRight = true;
-    }
-  }
-
-  gameState.keys.left = hasLeft;
-  gameState.keys.right = hasRight;
+function isSpaceKey(event) {
+  return (
+    event.code === "Space" ||
+    event.key === " " ||
+    event.key === "Space" ||
+    event.key === "Spacebar"
+  );
 }
 
 function render() {

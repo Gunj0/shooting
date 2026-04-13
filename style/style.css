@@ -85,8 +85,6 @@ body {
   background:
     radial-gradient(circle at top, rgba(120, 180, 255, 0.18), transparent 32%),
     linear-gradient(180deg, #112544 0%, #0a1730 65%, #060d1c 100%);
-  touch-action: none;
-  user-select: none;
 }
 
 .game-area::before {
