@@ -17,8 +17,8 @@
 ES Modules はファイルを直接ブラウザで開くと動作しないため、ローカルサーバーを使います。
 
 ```bash
-# pnpm でサーバーを起動（npx を使う方法）
-npx serve .
+# pnpm でサーバーを起動
+pnpm dlx serve .
 # または任意のローカル HTTP サーバー
 ```
 
