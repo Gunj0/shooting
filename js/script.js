@@ -172,10 +172,6 @@ function getTouchSide(touch) {
 
 function handleGameTouchStart(event) {
   event.preventDefault();
-  if (!gameState.hasStarted && !gameState.isGameOver) {
-    startGame();
-    return;
-  }
   for (const touch of event.changedTouches) {
     const side = getTouchSide(touch);
     if (side === "left") {
@@ -188,33 +184,23 @@ function handleGameTouchStart(event) {
 
 function handleGameTouchMove(event) {
   event.preventDefault();
+  applyTouchesToKeys(event.touches);
+}
+
+function handleGameTouchEnd(event) {
+  event.preventDefault();
+  applyTouchesToKeys(event.touches);
+}
+
+function applyTouchesToKeys(touches) {
   gameState.keys.left = false;
   gameState.keys.right = false;
-  for (const touch of event.touches) {
+  for (const touch of touches) {
     const side = getTouchSide(touch);
     if (side === "left") {
       gameState.keys.left = true;
     } else {
       gameState.keys.right = true;
-    }
-  }
-}
-
-function handleGameTouchEnd(event) {
-  event.preventDefault();
-  if (event.touches.length === 0) {
-    gameState.keys.left = false;
-    gameState.keys.right = false;
-  } else {
-    gameState.keys.left = false;
-    gameState.keys.right = false;
-    for (const touch of event.touches) {
-      const side = getTouchSide(touch);
-      if (side === "left") {
-        gameState.keys.left = true;
-      } else {
-        gameState.keys.right = true;
-      }
     }
   }
 }
