@@ -34,6 +34,12 @@ function setupGame() {
   window.addEventListener("keydown", handleKeyDown);
   window.addEventListener("keyup", handleKeyUp);
   elements.restartButton.addEventListener("click", () => restartGame(false));
+  elements.titleOverlay.addEventListener("touchstart", handleTitleTap, { passive: false });
+  elements.gameOverOverlay.addEventListener("touchstart", handleGameOverTap, { passive: false });
+  elements.gameElement.addEventListener("touchstart", handleGameTouchStart, { passive: false });
+  elements.gameElement.addEventListener("touchmove", handleGameTouchMove, { passive: false });
+  elements.gameElement.addEventListener("touchend", handleGameTouchEnd, { passive: false });
+  elements.gameElement.addEventListener("touchcancel", handleGameTouchEnd, { passive: false });
   showTitle();
   render();
 }
@@ -141,6 +147,75 @@ function handleKeyUp(event) {
   if (event.key === "ArrowRight") {
     event.preventDefault();
     gameState.keys.right = false;
+  }
+}
+
+function handleTitleTap(event) {
+  event.preventDefault();
+  if (!gameState.hasStarted) {
+    startGame();
+  }
+}
+
+function handleGameOverTap(event) {
+  event.preventDefault();
+  if (gameState.isGameOver) {
+    restartGame(true);
+  }
+}
+
+function getTouchSide(touch) {
+  const rect = elements.gameElement.getBoundingClientRect();
+  const relX = touch.clientX - rect.left;
+  return relX < rect.width / 2 ? "left" : "right";
+}
+
+function handleGameTouchStart(event) {
+  event.preventDefault();
+  if (!gameState.hasStarted && !gameState.isGameOver) {
+    startGame();
+    return;
+  }
+  for (const touch of event.changedTouches) {
+    const side = getTouchSide(touch);
+    if (side === "left") {
+      gameState.keys.left = true;
+    } else {
+      gameState.keys.right = true;
+    }
+  }
+}
+
+function handleGameTouchMove(event) {
+  event.preventDefault();
+  gameState.keys.left = false;
+  gameState.keys.right = false;
+  for (const touch of event.touches) {
+    const side = getTouchSide(touch);
+    if (side === "left") {
+      gameState.keys.left = true;
+    } else {
+      gameState.keys.right = true;
+    }
+  }
+}
+
+function handleGameTouchEnd(event) {
+  event.preventDefault();
+  if (event.touches.length === 0) {
+    gameState.keys.left = false;
+    gameState.keys.right = false;
+  } else {
+    gameState.keys.left = false;
+    gameState.keys.right = false;
+    for (const touch of event.touches) {
+      const side = getTouchSide(touch);
+      if (side === "left") {
+        gameState.keys.left = true;
+      } else {
+        gameState.keys.right = true;
+      }
+    }
   }
 }
 
