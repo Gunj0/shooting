@@ -2,6 +2,12 @@ import {
   BULLET_HEIGHT,
   BULLET_WIDTH,
   DIFFICULTY_SETTINGS,
+  EFFECT_ENEMY_LIFE,
+  EFFECT_ENEMY_SIZE,
+  EFFECT_PLAYER_LIFE,
+  EFFECT_PLAYER_SIZE,
+  EFFECT_POWERUP_LIFE,
+  EFFECT_POWERUP_SIZE,
   ENEMY_BASE_SPEED,
   ENEMY_HEIGHT,
   ENEMY_WIDTH,
@@ -142,8 +148,8 @@ export function handleCollisions(state) {
         state,
         enemy.x + enemy.width / 2,
         enemy.y + enemy.height / 2,
-        22,
-        14,
+        EFFECT_ENEMY_SIZE,
+        EFFECT_ENEMY_LIFE,
         "enemy",
       );
       activeEnemies.splice(collidedEnemyIndex, 1);
@@ -169,8 +175,8 @@ export function handleCollisions(state) {
         state,
         powerUp.x + powerUp.width / 2,
         powerUp.y + powerUp.height / 2,
-        30,
-        18,
+        EFFECT_POWERUP_SIZE,
+        EFFECT_POWERUP_LIFE,
         "powerup",
       );
       continue;
@@ -189,8 +195,8 @@ export function handleCollisions(state) {
       state,
       state.player.x + state.player.width / 2,
       state.player.y + state.player.height / 2,
-      54,
-      24,
+      EFFECT_PLAYER_SIZE,
+      EFFECT_PLAYER_LIFE,
       "player",
     );
   }

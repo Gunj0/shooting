@@ -4,6 +4,7 @@ import {
   ENEMY_BASE_SPEED,
   GAME_HEIGHT,
   GAME_WIDTH,
+  PLAYER_BOTTOM_MARGIN,
   PLAYER_HEIGHT,
   PLAYER_WIDTH,
 } from "./constants.js";
@@ -12,7 +13,7 @@ export function createInitialState(highScore) {
   return {
     player: {
       x: (GAME_WIDTH - PLAYER_WIDTH) / 2,
-      y: GAME_HEIGHT - PLAYER_HEIGHT - 16,
+      y: GAME_HEIGHT - PLAYER_HEIGHT - PLAYER_BOTTOM_MARGIN,
       width: PLAYER_WIDTH,
       height: PLAYER_HEIGHT,
     },

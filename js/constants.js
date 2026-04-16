@@ -22,6 +22,15 @@ export const POWER_UP_SPAWN_INTERVAL = 12000;
 export const POWER_UP_BULLET_SPEED_BOOST = 1.25;
 export const MAX_BULLET_SPEED = 13;
 
+export const PLAYER_BOTTOM_MARGIN = 16;
+
+export const EFFECT_ENEMY_SIZE = 22;
+export const EFFECT_ENEMY_LIFE = 14;
+export const EFFECT_PLAYER_SIZE = 54;
+export const EFFECT_PLAYER_LIFE = 24;
+export const EFFECT_POWERUP_SIZE = 30;
+export const EFFECT_POWERUP_LIFE = 18;
+
 export const DIFFICULTY_SETTINGS = {
   spawnRateStart: 0.02,
   spawnRateMax: 0.08,
