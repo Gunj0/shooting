@@ -40,14 +40,30 @@ function setupGame() {
   window.addEventListener("keydown", handleKeyDown);
   window.addEventListener("keyup", handleKeyUp);
   elements.restartButton.addEventListener("click", () => restartGame(false));
-  elements.titleOverlay.addEventListener("touchstart", handleTitleTap, { passive: false });
-  elements.gameOverOverlay.addEventListener("touchstart", handleGameOverTap, { passive: false });
-  elements.touchLeft.addEventListener("touchstart", handleTouchLeftStart, { passive: false });
-  elements.touchLeft.addEventListener("touchend", handleTouchLeftEnd, { passive: false });
-  elements.touchLeft.addEventListener("touchcancel", handleTouchLeftEnd, { passive: false });
-  elements.touchRight.addEventListener("touchstart", handleTouchRightStart, { passive: false });
-  elements.touchRight.addEventListener("touchend", handleTouchRightEnd, { passive: false });
-  elements.touchRight.addEventListener("touchcancel", handleTouchRightEnd, { passive: false });
+  elements.titleOverlay.addEventListener("touchstart", handleTitleTap, {
+    passive: false,
+  });
+  elements.gameOverOverlay.addEventListener("touchstart", handleGameOverTap, {
+    passive: false,
+  });
+  elements.touchLeft.addEventListener("touchstart", handleTouchLeftStart, {
+    passive: false,
+  });
+  elements.touchLeft.addEventListener("touchend", handleTouchLeftEnd, {
+    passive: false,
+  });
+  elements.touchLeft.addEventListener("touchcancel", handleTouchLeftEnd, {
+    passive: false,
+  });
+  elements.touchRight.addEventListener("touchstart", handleTouchRightStart, {
+    passive: false,
+  });
+  elements.touchRight.addEventListener("touchend", handleTouchRightEnd, {
+    passive: false,
+  });
+  elements.touchRight.addEventListener("touchcancel", handleTouchRightEnd, {
+    passive: false,
+  });
   showTitle();
   render();
 }

@@ -54,7 +54,11 @@ export function updatePlayerPosition(state) {
     state.player.x += PLAYER_SPEED;
   }
 
-  state.player.x = clamp(state.player.x, 0, state.gameWidth - state.player.width);
+  state.player.x = clamp(
+    state.player.x,
+    0,
+    state.gameWidth - state.player.width,
+  );
 }
 
 export function shootBullet(state, now) {
