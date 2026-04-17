@@ -20,6 +20,7 @@ test("createInitialState は期待どおりの初期値を返す", () => {
   assert.equal(state.score, 0);
   assert.equal(state.isGameOver, false);
   assert.equal(state.hasStarted, false);
+  assert.equal(state.gameWidth, GAME_WIDTH);
   assert.equal(state.bulletSpeed, BULLET_SPEED);
   assert.equal(state.enemySpeed, ENEMY_BASE_SPEED);
   assert.equal(state.enemySpawnRate, DIFFICULTY_SETTINGS.spawnRateStart);
@@ -35,4 +36,12 @@ test("createInitialState は期待どおりの初期値を返す", () => {
     width: PLAYER_WIDTH,
     height: PLAYER_HEIGHT,
   });
+});
+
+test("createInitialState はカスタム gameWidth を反映する", () => {
+  const customWidth = 400;
+  const state = createInitialState(0, customWidth);
+
+  assert.equal(state.gameWidth, customWidth);
+  assert.equal(state.player.x, (customWidth - PLAYER_WIDTH) / 2);
 });

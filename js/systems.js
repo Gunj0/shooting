@@ -12,7 +12,6 @@ import {
   ENEMY_HEIGHT,
   ENEMY_WIDTH,
   GAME_HEIGHT,
-  GAME_WIDTH,
   MAX_BULLET_SPEED,
   PLAYER_SPEED,
   POWER_UP_BULLET_SPEED_BOOST,
@@ -55,7 +54,7 @@ export function updatePlayerPosition(state) {
     state.player.x += PLAYER_SPEED;
   }
 
-  state.player.x = clamp(state.player.x, 0, GAME_WIDTH - state.player.width);
+  state.player.x = clamp(state.player.x, 0, state.gameWidth - state.player.width);
 }
 
 export function shootBullet(state, now) {
@@ -88,7 +87,7 @@ export function spawnEnemy(state) {
   }
 
   state.enemies.push({
-    x: Math.random() * (GAME_WIDTH - ENEMY_WIDTH),
+    x: Math.random() * (state.gameWidth - ENEMY_WIDTH),
     y: -ENEMY_HEIGHT,
     width: ENEMY_WIDTH,
     height: ENEMY_HEIGHT,
@@ -116,7 +115,7 @@ export function spawnPowerUp(state, now) {
   }
 
   state.powerUps.push({
-    x: Math.random() * (GAME_WIDTH - POWER_UP_WIDTH),
+    x: Math.random() * (state.gameWidth - POWER_UP_WIDTH),
     y: -POWER_UP_HEIGHT,
     width: POWER_UP_WIDTH,
     height: POWER_UP_HEIGHT,

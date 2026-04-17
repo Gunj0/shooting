@@ -24,9 +24,15 @@ const elements = {
   titleOverlay: document.getElementById("titleOverlay"),
   gameOverOverlay: document.getElementById("gameOverOverlay"),
   restartButton: document.getElementById("restartButton"),
+  touchLeft: document.getElementById("touchLeft"),
+  touchRight: document.getElementById("touchRight"),
 };
 
-let gameState = createInitialState(loadHighScore());
+function getGameWidth() {
+  return elements.gameElement.clientWidth;
+}
+
+let gameState = createInitialState(loadHighScore(), getGameWidth());
 let animationFrameId = null;
 let flashTimeoutId = null;
 
@@ -36,10 +42,12 @@ function setupGame() {
   elements.restartButton.addEventListener("click", () => restartGame(false));
   elements.titleOverlay.addEventListener("touchstart", handleTitleTap, { passive: false });
   elements.gameOverOverlay.addEventListener("touchstart", handleGameOverTap, { passive: false });
-  elements.gameElement.addEventListener("touchstart", handleGameTouchStart, { passive: false });
-  elements.gameElement.addEventListener("touchmove", handleGameTouchMove, { passive: false });
-  elements.gameElement.addEventListener("touchend", handleGameTouchEnd, { passive: false });
-  elements.gameElement.addEventListener("touchcancel", handleGameTouchEnd, { passive: false });
+  elements.touchLeft.addEventListener("touchstart", handleTouchLeftStart, { passive: false });
+  elements.touchLeft.addEventListener("touchend", handleTouchLeftEnd, { passive: false });
+  elements.touchLeft.addEventListener("touchcancel", handleTouchLeftEnd, { passive: false });
+  elements.touchRight.addEventListener("touchstart", handleTouchRightStart, { passive: false });
+  elements.touchRight.addEventListener("touchend", handleTouchRightEnd, { passive: false });
+  elements.touchRight.addEventListener("touchcancel", handleTouchRightEnd, { passive: false });
   showTitle();
   render();
 }
@@ -70,7 +78,7 @@ function restartGame(startImmediately = false) {
 
   elements.gameElement.classList.remove("hit-flash");
 
-  gameState = createInitialState(loadHighScore());
+  gameState = createInitialState(loadHighScore(), getGameWidth());
   hideGameOver();
 
   if (startImmediately) {
@@ -164,45 +172,24 @@ function handleGameOverTap(event) {
   }
 }
 
-function getTouchSide(touch) {
-  const rect = elements.gameElement.getBoundingClientRect();
-  const relX = touch.clientX - rect.left;
-  return relX < rect.width / 2 ? "left" : "right";
-}
-
-function handleGameTouchStart(event) {
+function handleTouchLeftStart(event) {
   event.preventDefault();
-  for (const touch of event.changedTouches) {
-    const side = getTouchSide(touch);
-    if (side === "left") {
-      gameState.keys.left = true;
-    } else {
-      gameState.keys.right = true;
-    }
-  }
+  gameState.keys.left = true;
 }
 
-function handleGameTouchMove(event) {
+function handleTouchLeftEnd(event) {
   event.preventDefault();
-  applyTouchesToKeys(event.touches);
-}
-
-function handleGameTouchEnd(event) {
-  event.preventDefault();
-  applyTouchesToKeys(event.touches);
-}
-
-function applyTouchesToKeys(touches) {
   gameState.keys.left = false;
+}
+
+function handleTouchRightStart(event) {
+  event.preventDefault();
+  gameState.keys.right = true;
+}
+
+function handleTouchRightEnd(event) {
+  event.preventDefault();
   gameState.keys.right = false;
-  for (const touch of touches) {
-    const side = getTouchSide(touch);
-    if (side === "left") {
-      gameState.keys.left = true;
-    } else {
-      gameState.keys.right = true;
-    }
-  }
 }
 
 function isSpaceKey(event) {

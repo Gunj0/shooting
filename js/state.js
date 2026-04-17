@@ -9,10 +9,11 @@ import {
   PLAYER_WIDTH,
 } from "./constants.js";
 
-export function createInitialState(highScore) {
+export function createInitialState(highScore, gameWidth = GAME_WIDTH) {
   return {
+    gameWidth,
     player: {
-      x: (GAME_WIDTH - PLAYER_WIDTH) / 2,
+      x: (gameWidth - PLAYER_WIDTH) / 2,
       y: GAME_HEIGHT - PLAYER_HEIGHT - PLAYER_BOTTOM_MARGIN,
       width: PLAYER_WIDTH,
       height: PLAYER_HEIGHT,
