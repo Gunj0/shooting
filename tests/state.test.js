@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
-  BULLET_SPEED,
   DIFFICULTY_SETTINGS,
   ENEMY_BASE_SPEED,
   GAME_HEIGHT,
@@ -21,7 +20,7 @@ test("createInitialState は期待どおりの初期値を返す", () => {
   assert.equal(state.isGameOver, false);
   assert.equal(state.hasStarted, false);
   assert.equal(state.gameWidth, GAME_WIDTH);
-  assert.equal(state.bulletSpeed, BULLET_SPEED);
+  assert.equal(state.bulletCount, 1);
   assert.equal(state.enemySpeed, ENEMY_BASE_SPEED);
   assert.equal(state.enemySpawnRate, DIFFICULTY_SETTINGS.spawnRateStart);
   assert.deepEqual(state.bullets, []);

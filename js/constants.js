@@ -19,10 +19,14 @@ export const SHOOT_INTERVAL = 300;
 export const HIGH_SCORE_STORAGE_KEY = "mini-shooting-high-score";
 export const PLAYER_HIT_FLASH_MS = 240;
 export const POWER_UP_SPAWN_INTERVAL = 12000;
-export const POWER_UP_BULLET_SPEED_BOOST = 1.25;
-export const MAX_BULLET_SPEED = 13;
+export const POWER_UP_BULLET_COUNT_BOOST = 1;
+export const MAX_BULLET_COUNT = 5;
+export const BULLET_SPREAD = 12;
 
 export const PLAYER_BOTTOM_MARGIN = 16;
+
+export const ENEMY_SWAY_AMPLITUDE = 60;
+export const ENEMY_SWAY_SPEED = 0.06;
 
 export const EFFECT_ENEMY_SIZE = 22;
 export const EFFECT_ENEMY_LIFE = 14;
@@ -37,5 +41,8 @@ export const DIFFICULTY_SETTINGS = {
   spawnRateStep: 0.002,
   speedStep: 0.5,
   speedMaxBonus: 2,
+  swayChanceStart: 0.1,
+  swayChanceMax: 0.5,
+  swayChanceStep: 0.04,
   intervalMs: 5000,
 };

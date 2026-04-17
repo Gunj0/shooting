@@ -1,5 +1,7 @@
 import {
   BULLET_HEIGHT,
+  BULLET_SPREAD,
+  BULLET_SPEED,
   BULLET_WIDTH,
   DIFFICULTY_SETTINGS,
   EFFECT_ENEMY_LIFE,
@@ -10,11 +12,13 @@ import {
   EFFECT_POWERUP_SIZE,
   ENEMY_BASE_SPEED,
   ENEMY_HEIGHT,
+  ENEMY_SWAY_AMPLITUDE,
+  ENEMY_SWAY_SPEED,
   ENEMY_WIDTH,
   GAME_HEIGHT,
-  MAX_BULLET_SPEED,
+  MAX_BULLET_COUNT,
   PLAYER_SPEED,
-  POWER_UP_BULLET_SPEED_BOOST,
+  POWER_UP_BULLET_COUNT_BOOST,
   POWER_UP_HEIGHT,
   POWER_UP_SPAWN_INTERVAL,
   POWER_UP_SPEED,
@@ -43,6 +47,11 @@ export function updateDifficulty(state, now) {
     ENEMY_BASE_SPEED + DIFFICULTY_SETTINGS.speedStep * nextDifficultyLevel,
     ENEMY_BASE_SPEED + DIFFICULTY_SETTINGS.speedMaxBonus,
   );
+  state.enemySwayChance = Math.min(
+    DIFFICULTY_SETTINGS.swayChanceStart +
+      DIFFICULTY_SETTINGS.swayChanceStep * nextDifficultyLevel,
+    DIFFICULTY_SETTINGS.swayChanceMax,
+  );
 }
 
 export function updatePlayerPosition(state) {
@@ -66,12 +75,16 @@ export function shootBullet(state, now) {
     return;
   }
 
-  state.bullets.push({
-    x: state.player.x + (state.player.width - BULLET_WIDTH) / 2,
-    y: state.player.y - BULLET_HEIGHT,
-    width: BULLET_WIDTH,
-    height: BULLET_HEIGHT,
-  });
+  const centerX = state.player.x + (state.player.width - BULLET_WIDTH) / 2;
+  for (let i = 0; i < state.bulletCount; i++) {
+    const offset = (i - (state.bulletCount - 1) / 2) * BULLET_SPREAD;
+    state.bullets.push({
+      x: centerX + offset,
+      y: state.player.y - BULLET_HEIGHT,
+      width: BULLET_WIDTH,
+      height: BULLET_HEIGHT,
+    });
+  }
 
   state.lastShotTime = now;
 }
@@ -80,7 +93,7 @@ export function updateBullets(state) {
   state.bullets = state.bullets
     .map((bullet) => ({
       ...bullet,
-      y: bullet.y - state.bulletSpeed,
+      y: bullet.y - BULLET_SPEED,
     }))
     .filter((bullet) => bullet.y + bullet.height >= 0);
 }
@@ -90,20 +103,37 @@ export function spawnEnemy(state) {
     return;
   }
 
+  const spawnX = Math.random() * (state.gameWidth - ENEMY_WIDTH);
+  const isSway = Math.random() < state.enemySwayChance;
+
   state.enemies.push({
-    x: Math.random() * (state.gameWidth - ENEMY_WIDTH),
+    x: spawnX,
     y: -ENEMY_HEIGHT,
     width: ENEMY_WIDTH,
     height: ENEMY_HEIGHT,
+    spawnX,
+    swayAmplitude: isSway ? ENEMY_SWAY_AMPLITUDE : 0,
+    swaySpeed: isSway ? ENEMY_SWAY_SPEED : 0,
+    age: 0,
   });
 }
 
 export function updateEnemies(state) {
   state.enemies = state.enemies
-    .map((enemy) => ({
-      ...enemy,
-      y: enemy.y + state.enemySpeed,
-    }))
+    .map((enemy) => {
+      const newAge = enemy.age + 1;
+      const swayX =
+        enemy.swayAmplitude > 0
+          ? enemy.spawnX +
+            Math.sin(newAge * enemy.swaySpeed) * enemy.swayAmplitude
+          : enemy.x;
+      return {
+        ...enemy,
+        x: clamp(swayX, 0, state.gameWidth - enemy.width),
+        y: enemy.y + state.enemySpeed,
+        age: newAge,
+      };
+    })
     .filter((enemy) => enemy.y <= GAME_HEIGHT);
 }
 
@@ -170,9 +200,9 @@ export function handleCollisions(state) {
   const remainingPowerUps = [];
   for (const powerUp of state.powerUps) {
     if (isColliding(powerUp, state.player)) {
-      state.bulletSpeed = Math.min(
-        state.bulletSpeed + POWER_UP_BULLET_SPEED_BOOST,
-        MAX_BULLET_SPEED,
+      state.bulletCount = Math.min(
+        state.bulletCount + POWER_UP_BULLET_COUNT_BOOST,
+        MAX_BULLET_COUNT,
       );
       addEffect(
         state,

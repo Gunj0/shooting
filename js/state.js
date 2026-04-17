@@ -1,5 +1,4 @@
 import {
-  BULLET_SPEED,
   DIFFICULTY_SETTINGS,
   ENEMY_BASE_SPEED,
   GAME_HEIGHT,
@@ -29,9 +28,10 @@ export function createInitialState(highScore, gameWidth = GAME_WIDTH) {
     },
     lastShotTime: 0,
     lastPowerUpSpawnTime: 0,
-    bulletSpeed: BULLET_SPEED,
+    bulletCount: 1,
     enemySpawnRate: DIFFICULTY_SETTINGS.spawnRateStart,
     enemySpeed: ENEMY_BASE_SPEED,
+    enemySwayChance: DIFFICULTY_SETTINGS.swayChanceStart,
     difficultyLevel: 0,
     startTime: 0,
     highScore,

@@ -21,7 +21,10 @@ export function renderFrame(state, elements) {
   state.bullets.forEach((bullet) =>
     renderEntity(gameElement, bullet, "bullet"),
   );
-  state.enemies.forEach((enemy) => renderEntity(gameElement, enemy, "enemy"));
+  state.enemies.forEach((enemy) => {
+    const cls = enemy.swayAmplitude > 0 ? "enemy enemy-sway" : "enemy";
+    renderEntity(gameElement, enemy, cls);
+  });
   state.powerUps.forEach((powerUp) =>
     renderEntity(gameElement, powerUp, "powerup"),
   );

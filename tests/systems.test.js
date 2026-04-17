@@ -2,9 +2,13 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  BULLET_SPEED,
   DIFFICULTY_SETTINGS,
   ENEMY_BASE_SPEED,
-  MAX_BULLET_SPEED,
+  ENEMY_SWAY_AMPLITUDE,
+  ENEMY_SWAY_SPEED,
+  GAME_WIDTH,
+  MAX_BULLET_COUNT,
   SHOOT_INTERVAL,
 } from "../js/constants.js";
 import { createInitialState } from "../js/state.js";
@@ -16,6 +20,7 @@ import {
   updateBullets,
   updateDifficulty,
   updateEffects,
+  updateEnemies,
 } from "../js/systems.js";
 
 test("shootBullet は発射間隔を満たした時だけ弾を追加する", () => {
@@ -29,6 +34,15 @@ test("shootBullet は発射間隔を満たした時だけ弾を追加する", ()
   assert.equal(state.bullets.length, 1);
 });
 
+test("shootBullet は bulletCount に応じて複数弾を生成する", () => {
+  const state = createInitialState(0);
+  state.bulletCount = 3;
+  state.lastShotTime = 0;
+
+  shootBullet(state, SHOOT_INTERVAL + 1);
+  assert.equal(state.bullets.length, 3);
+});
+
 test("updateBullets は弾を上へ移動し、画面外の弾を削除する", () => {
   const state = createInitialState(0);
   state.bullets = [
@@ -38,7 +52,7 @@ test("updateBullets は弾を上へ移動し、画面外の弾を削除する", 
 
   updateBullets(state);
   assert.equal(state.bullets.length, 1);
-  assert.equal(state.bullets[0].y, 3);
+  assert.equal(state.bullets[0].y, 10 - BULLET_SPEED);
 });
 
 test("updateDifficulty は難易度を段階的に上げ、上限を超えない", () => {
@@ -53,6 +67,7 @@ test("updateDifficulty は難易度を段階的に上げ、上限を超えない
     state.enemySpeed,
     ENEMY_BASE_SPEED + DIFFICULTY_SETTINGS.speedMaxBonus,
   );
+  assert.equal(state.enemySwayChance, DIFFICULTY_SETTINGS.swayChanceMax);
 });
 
 test("spawnEnemy は random 値が出現率未満なら敵を生成する", () => {
@@ -65,6 +80,94 @@ test("spawnEnemy は random 値が出現率未満なら敵を生成する", () =
   Math.random = originalRandom;
 
   assert.equal(state.enemies.length, 1);
+  assert.equal(typeof state.enemies[0].spawnX, "number");
+  assert.equal(typeof state.enemies[0].age, "number");
+});
+
+test("spawnEnemy は enemySwayChance に基づき蛇行敵を生成する", () => {
+  const state = createInitialState(0);
+  state.enemySpawnRate = 1.0;
+  state.enemySwayChance = 0.5;
+
+  const originalRandom = Math.random;
+  let callCount = 0;
+  // 1回目: spawnRate判定(0.0 < 1.0 で通過), 2回目: spawnX, 3回目: sway判定(0.0 < 0.5 で蛇行)
+  Math.random = () => {
+    callCount++;
+    return 0.0;
+  };
+  spawnEnemy(state);
+  Math.random = originalRandom;
+
+  assert.equal(state.enemies[0].swayAmplitude, ENEMY_SWAY_AMPLITUDE);
+  assert.equal(state.enemies[0].swaySpeed, ENEMY_SWAY_SPEED);
+});
+
+test("spawnEnemy は sway 判定が閾値以上なら直進敵を生成する", () => {
+  const state = createInitialState(0);
+  state.enemySpawnRate = 1.0;
+  state.enemySwayChance = 0.5;
+
+  const originalRandom = Math.random;
+  let callCount = 0;
+  // 1回目: spawnRate判定, 2回目: spawnX, 3回目: sway判定(0.9 >= 0.5 で直進)
+  Math.random = () => {
+    callCount++;
+    return callCount === 3 ? 0.9 : 0.0;
+  };
+  spawnEnemy(state);
+  Math.random = originalRandom;
+
+  assert.equal(state.enemies[0].swayAmplitude, 0);
+  assert.equal(state.enemies[0].swaySpeed, 0);
+});
+
+test("updateEnemies は蛇行敵の x を sin で横にずらす", () => {
+  const state = createInitialState(0);
+  const spawnX = GAME_WIDTH / 2;
+  state.enemies = [
+    {
+      x: spawnX,
+      y: 0,
+      width: 28,
+      height: 28,
+      spawnX,
+      swayAmplitude: ENEMY_SWAY_AMPLITUDE,
+      swaySpeed: ENEMY_SWAY_SPEED,
+      age: 0,
+    },
+  ];
+
+  updateEnemies(state);
+
+  const enemy = state.enemies[0];
+  assert.equal(enemy.age, 1);
+  const expectedX =
+    spawnX + Math.sin(1 * ENEMY_SWAY_SPEED) * ENEMY_SWAY_AMPLITUDE;
+  assert.ok(
+    Math.abs(enemy.x - expectedX) < 0.001,
+    `x should be close to ${expectedX}, got ${enemy.x}`,
+  );
+});
+
+test("updateEnemies は直進敵の x を変えない", () => {
+  const state = createInitialState(0);
+  state.enemies = [
+    {
+      x: 100,
+      y: 0,
+      width: 28,
+      height: 28,
+      spawnX: 100,
+      swayAmplitude: 0,
+      swaySpeed: 0,
+      age: 0,
+    },
+  ];
+
+  updateEnemies(state);
+
+  assert.equal(state.enemies[0].x, 100);
 });
 
 test("spawnPowerUp は間隔を満たし、かつ既存アイテムが無い時のみ生成する", () => {
@@ -99,9 +202,9 @@ test("handleCollisions は敵撃破時にスコア加算と演出追加を行う
   );
 });
 
-test("handleCollisions はパワーアップ取得で弾速を上げ、上限で止める", () => {
+test("handleCollisions はパワーアップ取得で弾数を増やし、上限で止める", () => {
   const state = createInitialState(0);
-  state.bulletSpeed = MAX_BULLET_SPEED - 0.1;
+  state.bulletCount = MAX_BULLET_COUNT - 1;
   state.powerUps = [
     {
       x: state.player.x,
@@ -113,7 +216,7 @@ test("handleCollisions はパワーアップ取得で弾速を上げ、上限で
 
   handleCollisions(state);
 
-  assert.equal(state.bulletSpeed, MAX_BULLET_SPEED);
+  assert.equal(state.bulletCount, MAX_BULLET_COUNT);
   assert.equal(state.powerUps.length, 0);
   assert.equal(
     state.effects.some((effect) => effect.type === "powerup"),
